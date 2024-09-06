@@ -11,10 +11,13 @@
 
 uint16_t read_capacitive_pin_T0(){   
     uint16_t filtered_value;
+    //Perform a filtered reading on the capacitive pin T0
+    //Supposedly, the filtered value will ignore the noise and give a more accurate reading
     touch_pad_read_filtered(0, &filtered_value);
     return filtered_value;
 }
 
 void capaticitive_pin_init(){
+    //Touch sensor configuration
     touch_pad_config(0, TOUCH_LIMIT);
 }

@@ -19,28 +19,34 @@
 uint16_t filtered_value;
 bool touch_detected = false;
 
-SemaphoreHandle_t mutex_data;
+SemaphoreHandle_t xMutex_data;
 
 static void read_sensor(void *pvParameter){
     while(1){
-        //xQueueSemaphoreTake(mutex_data);
-        filtered_value = read_capacitive_pin_T0();
-        printf("%d\n", filtered_value);
-        //xSemaphoreGive(mutex_data);
+        if(xMutex_data != NULL){
+            if( xSemaphoreTake(xMutex_data, ( TickType_t ) 10) == pdTRUE){
+                filtered_value = read_capacitive_pin_T0();
+                printf("%d\n", filtered_value);
+                xSemaphoreGive(xMutex_data);
+            }
+        }
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
 
 static void detect_human_touch(void *pvParameter){
     while(1){
-        //xQueueSemaphoreTake(mutex_data);
-        if(filtered_value <= 400){
-            touch_detected = true;
+        if(xMutex_data != NULL){
+            if( xSemaphoreTake(xMutex_data, ( TickType_t ) 10) == pdTRUE){
+                if(filtered_value <= 400){
+                    touch_detected = true;
+                }
+                else{
+                    touch_detected = false;
+                }
+                xSemaphoreGive(xMutex_data);
+            }
         }
-        else{
-            touch_detected = false;
-        }
-        //xSemaphoreGive(mutex_data);
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
@@ -64,7 +70,8 @@ void app_main(void)
 {   
     esp_rom_gpio_pad_select_gpio(LED);
     gpio_set_direction(LED, GPIO_MODE_OUTPUT);
-    mutex_data = xSemaphoreCreateMutex();
+    xMutex_data = xSemaphoreCreateBinary();
+    xSemaphoreGive(xMutex_data);
 
     ESP_ERROR_CHECK(touch_pad_init());
     ESP_ERROR_CHECK(touch_pad_set_voltage(TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V));

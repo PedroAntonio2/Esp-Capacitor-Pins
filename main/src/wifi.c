@@ -23,6 +23,7 @@ static const char *TAG="LOG_MQTT";
 static EventGroupHandle_t wifi_event_group;
 
 char mensagem[100];
+int i = 0;
 
 esp_mqtt_client_handle_t client;
 
@@ -59,6 +60,7 @@ static void on_wifi_disconnect(void* arg, esp_event_base_t event_base,
     esp_wifi_connect();
     xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
     ESP_LOGI(TAG, "Disconnected. Connecting to the AP again...");
+    i++;
 }
 
 static void on_wifi_start(void* arg, esp_event_base_t event_base,
@@ -145,7 +147,7 @@ static void mqtt_initialize_receive(void) { //Depending on your website or cloud
     esp_mqtt_client_start(client); //starting the process
 }
 
-void initialise_wifi() {
+int initialise_wifi() {
     wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(nvs_flash_init());
@@ -187,11 +189,11 @@ void initialise_wifi() {
     ESP_LOGI(TAG, "wifi_init_sta finished.");
 
     // Aguarde até que o dispositivo esteja conectado ao Wi-Fi
-    xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
+    xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, 10000 / portTICK_PERIOD_MS);
     printf("Connected to AP\n");
-
     // Inicialize o MQTT para receber mensagens
     mqtt_initialize_receive();
+    return 1;
 }
 
 void subscribe_to_topic(char topic[50]) {
@@ -200,5 +202,14 @@ void subscribe_to_topic(char topic[50]) {
         ESP_LOGE(TAG, "Failed to subscribe to the topic");
     } else {
         ESP_LOGI(TAG, "Subscribed to the topic: %s", topic);
+    }
+}
+
+void send_data_to_topic(char topic[18], char data[2]) {
+    int msg_id = esp_mqtt_client_publish(client, topic, data, 0, 0, 0); // Publish the data to the topic
+    if (msg_id == -1) {
+        ESP_LOGE(TAG, "Failed to publish the data to the topic");
+    } else {
+        ESP_LOGI(TAG, "Published the data to the topic: %s", topic);
     }
 }

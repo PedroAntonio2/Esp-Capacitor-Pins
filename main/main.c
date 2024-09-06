@@ -11,9 +11,11 @@
 
 #include "board.h"
 #include "capacitive_touch.h"
+#include "wifi.h"
 
 uint16_t filtered_value;
 bool touch_detected = false;
+bool last_touch_detected = false;
 
 SemaphoreHandle_t xMutex_data;
 
@@ -26,7 +28,7 @@ static void read_sensor(void *pvParameter){
                 xSemaphoreGive(xMutex_data);
             }
         }
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(150 / portTICK_PERIOD_MS);
     }
 }
 
@@ -44,7 +46,7 @@ static void detect_human_touch(void *pvParameter){
                 xSemaphoreGive(xMutex_data);
             }
         }
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(150 / portTICK_PERIOD_MS);
     }
 }
 
@@ -58,8 +60,16 @@ static void blink_led(void *pvParameter){
             gpio_set_level(LED, false);
             printf("LED off\n");
         }
-
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        if(last_touch_detected != touch_detected){
+            if(touch_detected){
+                send_data_to_topic("20211610015/touch", "1");
+            }
+            else{
+            send_data_to_topic("20211610015/touch", "0");
+            }
+        }
+        last_touch_detected = touch_detected;
+        vTaskDelay(75 / portTICK_PERIOD_MS);
     }
 }
 

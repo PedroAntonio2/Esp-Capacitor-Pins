@@ -147,7 +147,7 @@ static void mqtt_initialize_receive(void) { //Depending on your website or cloud
     esp_mqtt_client_start(client); //starting the process
 }
 
-int initialise_wifi() {
+void initialise_wifi() {
     wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(nvs_flash_init());
@@ -190,10 +190,8 @@ int initialise_wifi() {
 
     // Aguarde até que o dispositivo esteja conectado ao Wi-Fi
     xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, 10000 / portTICK_PERIOD_MS);
-    printf("Connected to AP\n");
     // Inicialize o MQTT para receber mensagens
     mqtt_initialize_receive();
-    return 1;
 }
 
 void subscribe_to_topic(char topic[50]) {

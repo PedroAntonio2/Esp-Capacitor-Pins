@@ -21,11 +21,5 @@ void board_init() {
   printf("Finished LED and Touch sensor");
 
   printf("Starting Wifi init");
-  wifi_status = initialise_wifi();
-  if(wifi_status == 1){
-    printf("Wifi init success");
-  }
-  else{
-    printf("Wifi init failed");
-  }
+  initialise_wifi();
 }

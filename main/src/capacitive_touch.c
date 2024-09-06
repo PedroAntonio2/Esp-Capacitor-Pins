@@ -19,5 +19,8 @@ uint16_t read_capacitive_pin_T0(){
 
 void capaticitive_pin_init(){
     //Touch sensor configuration
+    ESP_ERROR_CHECK(touch_pad_init());
+    ESP_ERROR_CHECK(touch_pad_set_voltage(TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V));
     touch_pad_config(0, TOUCH_LIMIT);
+    ESP_ERROR_CHECK(touch_pad_filter_start(TOUCHPAD_FILTER_TOUCH_PERIOD));
 }

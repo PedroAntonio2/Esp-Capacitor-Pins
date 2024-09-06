@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "Esp-Capacitor-Pins",
-    "project_version":    "1",
+    "project_version":    "165f27e-dirty",
     "project_path":       "/home/gpds/Esp-Capacitor-Pins",
     "idf_path":           "/home/gpds/esp/v5.3/esp-idf",
     "build_dir":          "/home/gpds/Esp-Capacitor-Pins/build",
@@ -1165,7 +1165,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/gpds/Esp-Capacitor-Pins/build/esp-idf/main/libmain.a",
-            "sources": [ "/home/gpds/Esp-Capacitor-Pins/main/main.c", "/home/gpds/Esp-Capacitor-Pins/main/src/capacitive_touch.c" ],
+            "sources": [ "/home/gpds/Esp-Capacitor-Pins/main/main.c", "/home/gpds/Esp-Capacitor-Pins/main/src/capacitive_touch.c", "/home/gpds/Esp-Capacitor-Pins/main/src/wifi.c", "/home/gpds/Esp-Capacitor-Pins/main/src/board.c" ],
             "include_dirs": [ "include" ]
         },
         "mbedtls": {
@@ -1195,7 +1195,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/gpds/Esp-Capacitor-Pins/build/esp-idf/mqtt/libmqtt.a",
-            "sources": [ "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/mqtt_client.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/lib/mqtt_msg.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/lib/mqtt_outbox.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/lib/platform_esp32_idf.c" ],
+            "sources": [ "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/mqtt_client.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/lib/mqtt_msg.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/lib/mqtt_outbox.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/lib/platform_esp32_idf.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/lib/mqtt5_msg.c", "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/mqtt5_client.c" ],
             "include_dirs": [ "/home/gpds/esp/v5.3/esp-idf/components/mqtt/esp-mqtt/include" ]
         },
         "newlib": {

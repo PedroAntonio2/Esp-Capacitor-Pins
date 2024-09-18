@@ -7,6 +7,7 @@
 #include "freertos/semphr.h"
 #include "driver/touch_pad.h"
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 #include "esp_log.h"
 
 #include "board.h"
@@ -28,7 +29,7 @@ static void read_sensor(void *pvParameter){
                 xSemaphoreGive(xMutex_data);
             }
         }
-        vTaskDelay(150 / portTICK_PERIOD_MS);
+        vTaskDelay(80 / portTICK_PERIOD_MS);
     }
 }
 
@@ -46,18 +47,22 @@ static void detect_human_touch(void *pvParameter){
                 xSemaphoreGive(xMutex_data);
             }
         }
-        vTaskDelay(150 / portTICK_PERIOD_MS);
+        vTaskDelay(80 / portTICK_PERIOD_MS);
     }
 }
 
 static void blink_led(void *pvParameter){
     while(1){
         if(touch_detected){
-            gpio_set_level(LED, true);
+            //gpio_set_level(LED, true);
+            ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, 4000);
+            ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
             printf("LED on\n");
         }
         else{
-            gpio_set_level(LED, false);
+            //gpio_set_level(LED, false);
+            ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, 0);
+            ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
             printf("LED off\n");
         }
         if(last_touch_detected != touch_detected){
@@ -69,7 +74,7 @@ static void blink_led(void *pvParameter){
             }
         }
         last_touch_detected = touch_detected;
-        vTaskDelay(75 / portTICK_PERIOD_MS);
+        vTaskDelay(40 / portTICK_PERIOD_MS);
     }
 }
 

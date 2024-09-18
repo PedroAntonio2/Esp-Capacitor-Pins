@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Custom
+build
+
 # Distribution / packaging
 .Python
 env/
@@ -86,7 +89,6 @@ dmypy.json
 cython_debug/
 
 # Editor-specific files
-.vscode/
 .idea/
 *.swp
 *.swo

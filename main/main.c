@@ -14,7 +14,8 @@
 #include "capacitive_touch.h"
 #include "wifi.h"
 
-uint16_t filtered_value;
+uint16_t filtered_value = 500;
+uint8_t current_pin = 0;
 bool touch_detected = false;
 bool last_touch_detected = false;
 
@@ -24,20 +25,16 @@ static void read_sensor(void *pvParameter){
     while(1){
         if(xMutex_data != NULL){
             if( xSemaphoreTake(xMutex_data, ( TickType_t ) 10) == pdTRUE){
-                filtered_value = read_capacitive_pin_T0();
-                printf("%d\n", filtered_value);
-                xSemaphoreGive(xMutex_data);
-            }
-        }
-        vTaskDelay(80 / portTICK_PERIOD_MS);
-    }
-}
-
-static void detect_human_touch(void *pvParameter){
-    while(1){
-        if(xMutex_data != NULL){
-            if( xSemaphoreTake(xMutex_data, ( TickType_t ) 10) == pdTRUE){
-                //Touch detection(400 is the threshold value, arbitrarily chosen)
+                if(current_pin == 6){
+                    current_pin = 0;
+                }
+                else{
+                    current_pin++;
+                }
+                if(current_pin == 1){
+                    current_pin++;
+                }
+                filtered_value = read_capacitive_pin(current_pin);
                 if(filtered_value <= 400){
                     touch_detected = true;
                 }
@@ -47,24 +44,24 @@ static void detect_human_touch(void *pvParameter){
                 xSemaphoreGive(xMutex_data);
             }
         }
-        vTaskDelay(80 / portTICK_PERIOD_MS);
+        vTaskDelay(12 / portTICK_PERIOD_MS);
     }
 }
 
-static void blink_led(void *pvParameter){
+static void update_pwm(void *pvParameter){
     while(1){
         if(touch_detected){
             //gpio_set_level(LED, true);
-            ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, 4000);
-            ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
-            printf("LED on\n");
+            ledc_set_duty(LEDC_HIGH_SPEED_MODE, current_pin, 50);
+            ledc_update_duty(LEDC_HIGH_SPEED_MODE, current_pin);
+            printf("%d LED on\n", current_pin);
         }
         else{
             //gpio_set_level(LED, false);
-            ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, 0);
-            ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
-            printf("LED off\n");
+            ledc_set_duty(LEDC_HIGH_SPEED_MODE, current_pin, 0);
+            ledc_update_duty(LEDC_HIGH_SPEED_MODE, current_pin);
         }
+        /*
         if(last_touch_detected != touch_detected){
             if(touch_detected){
                 send_data_to_topic("20211610015/touch", "1");
@@ -73,8 +70,9 @@ static void blink_led(void *pvParameter){
             send_data_to_topic("20211610015/touch", "0");
             }
         }
+        */
         last_touch_detected = touch_detected;
-        vTaskDelay(40 / portTICK_PERIOD_MS);
+        vTaskDelay(4 / portTICK_PERIOD_MS);
     }
 }
 
@@ -89,7 +87,6 @@ void app_main(void)
     board_init();
 
     //Task creation
-    xTaskCreate(&read_sensor, "Read T0 capacitive Pin", 4096, NULL, 5, NULL);
-    xTaskCreate(&detect_human_touch, "Detect Pin touch", 2048, NULL, 5, NULL);
-    xTaskCreate(&blink_led, "Blink LED according to touch", 2048, NULL, 5, NULL);
+    xTaskCreate(&read_sensor, "Read T0 capacitive Pin and detect touch", 4096, NULL, 5, NULL);
+    xTaskCreate(&update_pwm, "Change PWM according to touch", 2048, NULL, 5, NULL);
 }

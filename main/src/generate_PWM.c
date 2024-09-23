@@ -25,3 +25,9 @@ void setup_pwm(ledc_timer_bit_t duty_resolution, uint16_t freq, ledc_mode_t spee
     };
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 }
+
+void setup_pwm_for_touch(uint8_t channel, uint16_t freq, uint8_t pin){
+    setup_pwm(LEDC_TIMER_13_BIT, freq, LEDC_HIGH_SPEED_MODE, LEDC_TIMER_0, channel, pin);
+}
+
+//setup_pwm(LEDC_TIMER_13_BIT, 261, LEDC_HIGH_SPEED_MODE, LEDC_TIMER_0, LEDC_CHANNEL_0, touch0);

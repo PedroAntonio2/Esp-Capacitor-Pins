@@ -105,7 +105,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     }
 }
 
-//Receber mensagens
+//Receive messages
 
 static void mqtt_initialize_receive(void) { //Depending on your website or cloud there could be more parameters in mqtt_cfg.
     esp_log_level_set("*", ESP_LOG_DEBUG);
@@ -159,7 +159,7 @@ void initialise_wifi() {
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
-    // Registra manipuladores de eventos
+    // Event handler for Wi-Fi events
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
                                                         WIFI_EVENT_STA_START,
                                                         &on_wifi_start,
@@ -188,9 +188,9 @@ void initialise_wifi() {
 
     ESP_LOGI(TAG, "wifi_init_sta finished.");
 
-    // Aguarde até que o dispositivo esteja conectado ao Wi-Fi
+    // Wait for the connection, 10s timeout
     xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, 10000 / portTICK_PERIOD_MS);
-    // Inicialize o MQTT para receber mensagens
+    // MQTT initialization
     mqtt_initialize_receive();
 }
 

@@ -27,7 +27,22 @@ void setup_pwm(ledc_timer_bit_t duty_resolution, uint16_t freq, ledc_mode_t spee
 }
 
 void setup_pwm_for_touch(uint8_t channel, uint16_t freq, uint8_t pin){
-    setup_pwm(LEDC_TIMER_13_BIT, freq, LEDC_HIGH_SPEED_MODE, LEDC_TIMER_0, channel, pin);
+    ledc_mode_t speed_mode;
+    ledc_timer_t timer_num;
+
+    // Dividindo os buzzers entre alta e baixa velocidade
+    if (channel < 4) {
+        // Primeiros 4 buzzers usando timers de alta velocidade
+        speed_mode = LEDC_HIGH_SPEED_MODE;
+        timer_num = (ledc_timer_t)channel;  // Usando um timer diferente para cada canal
+    } else {
+        // Próximos 3 buzzers usando timers de baixa velocidade
+        speed_mode = LEDC_LOW_SPEED_MODE;
+        timer_num = (ledc_timer_t)(channel - 4);  // Utilizando os 3 timers disponíveis no modo de baixa velocidade
+    }
+
+    setup_pwm(LEDC_TIMER_13_BIT, freq, speed_mode, timer_num, channel, pin);
 }
+
 
 //setup_pwm(LEDC_TIMER_13_BIT, 261, LEDC_HIGH_SPEED_MODE, LEDC_TIMER_0, LEDC_CHANNEL_0, touch0);
